@@ -1,0 +1,550 @@
+‏<!DOCTYPE html>
+‏<html lang="ar" dir="rtl">
+‏<head>
+‏    <meta charset="UTF-8">
+‏    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+‏    <title>ذكاء الطالب - تصميم علي عمر علي باشحبل</title>
+‏    <!-- Google Fonts & FontAwesome -->
+‏    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700&display=swap" rel="stylesheet">
+‏    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+‏    <style>
+‏        :root {
+‏            --primary: #6366f1;
+‏            --primary-hover: #4f46e5;
+‏            --bg-main: #0b0f19;
+‏            --bg-card: #1e293b;
+‏            --border-color: rgba(255, 255, 255, 0.08);
+‏            --text-main: #f8fafc;
+‏            --text-muted: #94a3b8;
+‏            --success: #10b981;
+‏            --danger: #ef4444;
+        }
+
+        * {
+‏            box-sizing: border-box;
+‏            margin: 0;
+‏            padding: 0;
+‏            font-family: 'Cairo', sans-serif;
+‏            scroll-behavior: smooth;
+        }
+
+‏        body {
+‏            background-color: var(--bg-main);
+‏            color: var(--text-main);
+‏            display: flex;
+‏            min-height: 100vh;
+‏            flex-direction: column;
+        }
+
+        /* شاشة تسجيل الدخول */
+‏        #loginOverlay {
+‏            position: fixed;
+‏            top: 0;
+‏            left: 0;
+‏            width: 100%;
+‏            height: 100%;
+‏            background: var(--bg-main);
+‏            display: flex;
+‏            justify-content: center;
+‏            align-items: center;
+‏            z-index: 9999;
+‏            padding: 20px;
+        }
+
+‏        .login-card {
+‏            background: var(--bg-card);
+‏            border: 1px solid var(--border-color);
+‏            padding: 35px;
+‏            border-radius: 20px;
+‏            width: 100%;
+‏            max-width: 400px;
+‏            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.6);
+‏            text-align: center;
+        }
+
+‏        .login-card h2 {
+‏            color: #818cf8;
+‏            margin-bottom: 8px;
+‏            font-size: 1.4rem;
+        }
+
+‏        .login-card p {
+‏            color: var(--text-muted);
+‏            font-size: 0.85rem;
+‏            margin-bottom: 25px;
+        }
+
+        /* التطبيق الرئيسي */
+‏        #appContainer {
+‏            display: none;
+‏            width: 100%;
+‏            min-height: 100vh;
+‏            flex-direction: column;
+        }
+
+‏        .layout-wrapper {
+‏            display: flex;
+‏            flex: 1;
+        }
+
+        /* القائمة الجانبية */
+‏        aside {
+‏            width: 260px;
+‏            background: var(--bg-card);
+‏            border-left: 1px solid var(--border-color);
+‏            position: fixed;
+‏            height: 100vh;
+‏            display: flex;
+‏            flex-direction: column;
+‏            padding: 20px;
+‏            z-index: 10;
+        }
+
+‏        .logo-area {
+‏            display: flex;
+‏            align-items: center;
+‏            gap: 12px;
+‏            font-size: 1.1rem;
+‏            font-weight: 700;
+‏            color: #818cf8;
+‏            margin-bottom: 25px;
+‏            padding-bottom: 15px;
+‏            border-bottom: 1px solid var(--border-color);
+        }
+
+‏        .nav-menu {
+‏            list-style: none;
+‏            display: flex;
+‏            flex-direction: column;
+‏            gap: 6px;
+‏            flex: 1;
+        }
+
+‏        .nav-menu li a {
+‏            display: flex;
+‏            align-items: center;
+‏            gap: 12px;
+‏            color: var(--text-muted);
+‏            text-decoration: none;
+‏            padding: 10px 15px;
+‏            border-radius: 10px;
+‏            font-size: 0.9rem;
+‏            transition: all 0.3s ease;
+        }
+
+‏        .nav-menu li a:hover, .nav-menu li a.active {
+‏            background: var(--primary);
+‏            color: white;
+‏            transform: translateX(-5px);
+        }
+
+        /* خانة حقوق الملكية */
+‏        .copyright-box {
+‏            border-top: 1px solid var(--border-color);
+‏            padding-top: 12px;
+‏            text-align: center;
+‏            font-size: 0.8rem;
+‏            color: var(--text-muted);
+‏            line-height: 1.5;
+‏            background: rgba(11, 15, 25, 0.4);
+‏            border-radius: 10px;
+‏            padding: 12px;
+‏            margin-top: 10px;
+        }
+
+‏        .copyright-box span {
+‏            color: #818cf8;
+‏            font-weight: 700;
+‏            display: block;
+‏            margin-top: 4px;
+        }
+
+        /* المحتوى الرئيسي */
+‏        main {
+‏            margin-right: 260px;
+‏            flex: 1;
+‏            padding: 30px;
+‏            max-width: 1000px;
+        }
+
+‏        .header-banner {
+‏            background: linear-gradient(135deg, #4f46e5, #3b82f6);
+‏            border-radius: 16px;
+‏            padding: 25px;
+‏            margin-bottom: 30px;
+‏            box-shadow: 0 10px 25px rgba(79, 70, 229, 0.2);
+‏            display: flex;
+‏            justify-content: space-between;
+‏            align-items: center;
+        }
+
+‏        .header-banner h1 {
+‏            font-size: 1.5rem;
+‏            margin-bottom: 5px;
+        }
+
+‏        .header-banner p {
+‏            color: #e0e7ff;
+‏            font-size: 0.9rem;
+        }
+
+        /* صندوق القسم المحاسبي */
+‏        .accounting-section {
+‏            background: var(--bg-card);
+‏            border: 1px solid var(--border-color);
+‏            border-radius: 16px;
+‏            padding: 25px;
+‏            margin-bottom: 25px;
+‏            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+‏        .accounting-section h2 {
+‏            font-size: 1.2rem;
+‏            color: #818cf8;
+‏            margin-bottom: 20px;
+‏            display: flex;
+‏            align-items: center;
+‏            gap: 10px;
+‏            border-bottom: 1px solid var(--border-color);
+‏            padding-bottom: 12px;
+        }
+
+‏        .form-grid {
+‏            display: grid;
+‏            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+‏            gap: 15px;
+‏            margin-bottom: 15px;
+        }
+
+‏        .input-group {
+‏            display: flex;
+‏            flex-direction: column;
+‏            gap: 6px;
+        }
+
+‏        label {
+‏            font-size: 0.85rem;
+‏            color: var(--text-muted);
+        }
+
+‏        input {
+‏            width: 100%;
+‏            padding: 10px 14px;
+‏            background: rgba(11, 15, 25, 0.6);
+‏            border: 1px solid var(--border-color);
+‏            border-radius: 8px;
+‏            color: white;
+‏            font-size: 0.95rem;
+‏            outline: none;
+‏            transition: border-color 0.2s;
+        }
+
+‏        input:focus {
+‏            border-color: var(--primary);
+        }
+
+‏        .btn-custom {
+‏            background: var(--primary);
+‏            color: white;
+‏            border: none;
+‏            padding: 10px 20px;
+‏            border-radius: 8px;
+‏            font-weight: 600;
+‏            cursor: pointer;
+‏            width: 100%;
+‏            transition: background 0.2s;
+‏            margin-top: 5px;
+        }
+
+‏        .btn-custom:hover {
+‏            background: var(--primary-hover);
+        }
+
+‏        .result-display {
+‏            margin-top: 15px;
+‏            padding: 12px;
+‏            background: rgba(16, 185, 129, 0.1);
+‏            border: 1px solid rgba(16, 185, 129, 0.2);
+‏            border-radius: 8px;
+‏            color: var(--success);
+‏            text-align: center;
+‏            font-weight: 600;
+‏            font-size: 0.95rem;
+‏            display: none;
+        }
+
+‏        table {
+‏            width: 100%;
+‏            border-collapse: collapse;
+‏            margin-top: 15px;
+‏            font-size: 0.9rem;
+        }
+
+‏        th, td {
+‏            padding: 10px;
+‏            text-align: right;
+‏            border-bottom: 1px solid var(--border-color);
+        }
+
+‏        th {
+‏            background: rgba(11, 15, 25, 0.5);
+‏            color: #818cf8;
+        }
+
+‏        @media (max-width: 768px) {
+‏            aside {
+‏                position: relative;
+‏                width: 100%;
+‏                height: auto;
+‏                border-left: none;
+‏                border-bottom: 1px solid var(--border-color);
+            }
+‏            main {
+‏                margin-right: 0;
+‏                padding: 15px;
+            }
+‏            .layout-wrapper {
+‏                flex-direction: column;
+            }
+        }
+‏    </style>
+‏</head>
+‏<body>
+
+    <!-- شاشة تسجيل الدخول -->
+‏    <div id="loginOverlay">
+‏        <div class="login-card">
+‏            <h2><i class="fa-solid fa-graduation-cap"></i> ذكاء الطالب</h2>
+‏            <p>تصميم: علي عمر علي باشحبل</p>
+‏            <div class="input-group" style="margin-bottom: 15px; text-align: right;">
+‏                <label>اسم الطالب</label>
+‏                <input type="text" id="loginName" placeholder="أدخل اسمك الكريم">
+‏            </div>
+‏            <div class="input-group" style="margin-bottom: 20px; text-align: right;">
+‏                <label>كلمة السر</label>
+‏                <input type="password" id="loginPass" placeholder="أدخل كلمة المرور">
+‏            </div>
+‏            <button class="btn-custom" onclick="handleLogin()">دخول للنظام</button>
+‏        </div>
+‏    </div>
+
+    <!-- التطبيق المحاسبي الرئيسي -->
+‏    <div id="appContainer">
+‏        <div class="layout-wrapper">
+            <!-- القائمة الجانبية -->
+‏            <aside>
+‏                <div class="logo-area">
+‏                    <i class="fa-solid fa-brain"></i>
+‏                    <span>ذكاء الطالب</span>
+‏                </div>
+‏                <ul class="nav-menu">
+‏                    <li><a href="#sec-journal" class="active"><i class="fa-solid fa-book"></i> دفتر اليومية</a></li>
+‏                    <li><a href="#sec-ledger"><i class="fa-solid fa-address-book"></i> دفتر الأستاذ</a></li>
+‏                    <li><a href="#sec-trial"><i class="fa-solid fa-scale-balanced"></i> ميزان المراجعة</a></li>
+‏                    <li><a href="#sec-trading"><i class="fa-solid fa-store"></i> حساب المتاجرة</a></li>
+‏                    <li><a href="#sec-income"><i class="fa-solid fa-file-invoice-dollar"></i> قائمة الدخل</a></li>
+‏                    <li><a href="#sec-bs"><i class="fa-solid fa-building-columns"></i> الميزانية العمومية</a></li>
+‏                </ul>
+                <!-- خانة حقوق الملكية -->
+‏                <div class="copyright-box">
+                    جميع الحقوق محفوظة © 2026
+‏                    <span>علي عمر علي باشحبل</span>
+‏                </div>
+‏            </aside>
+
+            <!-- المحتوى الرئيسي -->
+‏            <main>
+‏                <div class="header-banner">
+‏                    <div>
+‏                        <h1>نظام ذكاء الطالب المحاسبي</h1>
+‏                        <p>مرحباً بك يا <span id="welcomeStudentName" style="font-weight: bold; color: #fff;"></span>، نظّم عملياتك المالية بدقة وسهولة.</p>
+‏                    </div>
+‏                    <i class="fa-solid fa-calculator fa-3x" style="opacity: 0.8;"></i>
+‏                </div>
+
+                <!-- 1. دفتر اليومية -->
+‏                <section id="sec-journal" class="accounting-section">
+‏                    <h2><i class="fa-solid fa-book"></i> 1. دفتر اليومية العامة</h2>
+‏                    <div class="form-grid">
+‏                        <div class="input-group" style="grid-column: span 2;"><label>بيان العملية المحاسبية</label><input type="text" id="jDesc" placeholder="مثلاً: شراء أثاث نقداً"></div>
+‏                        <div class="input-group"><label>حـ/ المدين</label><input type="text" id="jDebit" placeholder="الأثاث"></div>
+‏                        <div class="input-group"><label>المبلغ ($)</label><input type="number" id="jAmount" placeholder="0.00"></div>
+‏                        <div class="input-group" style="grid-column: span 2;"><label>حـ/ الدائن</label><input type="text" id="jCredit" placeholder="الصندوق"></div>
+‏                    </div>
+‏                    <button class="btn-custom" onclick="addJournalEntry()">تسجيل وحفظ القيد</button>
+‏                    <div style="max-height: 160px; overflow-y: auto;">
+‏                        <table>
+‏                            <thead><tr><th>البيان المحاسبي</th><th>تفاصيل القيد</th></tr></thead>
+‏                            <tbody id="jTableBody"><tr><td colspan="2" style="text-align: center; color: var(--text-muted);">لم يتم تسجيل قيود بعد</td></tr></tbody>
+‏                        </table>
+‏                    </div>
+‏                </section>
+
+                <!-- 2. دفتر الأستاذ -->
+‏                <section id="sec-ledger" class="accounting-section">
+‏                    <h2><i class="fa-solid fa-address-book"></i> 2. دفتر الأستاذ (ترصيد الحسابات)</h2>
+‏                    <div class="input-group" style="margin-bottom: 15px;"><label>اسم الحساب</label><input type="text" id="lName" placeholder="مثلاً: حـ/ الصندوق"></div>
+‏                    <div class="form-grid">
+‏                        <div class="input-group"><label>إجمالي الطرف المدين ($)</label><input type="number" id="lDebit" value="0"></div>
+‏                        <div class="input-group"><label>إجمالي الطرف الدائن ($)</label><input type="number" id="lCredit" value="0"></div>
+‏                    </div>
+‏                    <button class="btn-custom" onclick="calcLedger()">استخراج رصيد الحساب</button>
+‏                    <div id="lResult" class="result-display"></div>
+‏                </section>
+
+                <!-- 3. ميزان المراجعة -->
+‏                <section id="sec-trial" class="accounting-section">
+‏                    <h2><i class="fa-solid fa-scale-balanced"></i> 3. ميزان المراجعة بالأرصدة</h2>
+‏                    <div class="form-grid">
+‏                        <div class="input-group"><label>إجمالي الأرصدة المدنية ($)</label><input type="number" id="tDebit" value="0" oninput="calcTrial()"></div>
+‏                        <div class="input-group"><label>إجمالي الأرصدة الدائنة ($)</label><input type="number" id="tCredit" value="0" oninput="calcTrial()"></div>
+‏                    </div>
+‏                    <div id="tResult" class="result-display"></div>
+‏                </section>
+
+                <!-- 4. حساب المتاجرة -->
+‏                <section id="sec-trading" class="accounting-section">
+‏                    <h2><i class="fa-solid fa-store"></i> 4. حساب المتاجرة</h2>
+‏                    <div class="form-grid">
+‏                        <div class="input-group"><label>بضاعة أول المدة ($)</label><input type="number" id="trOpen" value="0"></div>
+‏                        <div class="input-group"><label>صافي المشتريات ($)</label><input type="number" id="trPurchases" value="0"></div>
+‏                        <div class="input-group"><label>صافي المبيعات ($)</label><input type="number" id="trSales" value="0"></div>
+‏                        <div class="input-group"><label>بضاعة آخر المدة ($)</label><input type="number" id="trClose" value="0"></div>
+‏                    </div>
+‏                    <button class="btn-custom" onclick="calcTrading()">احتساب مجمل الربح/الخسارة</button>
+‏                    <div id="trResult" class="result-display"></div>
+‏                </section>
+
+                <!-- 5. قائمة الدخل -->
+‏                <section id="sec-income" class="accounting-section">
+‏                    <h2><i class="fa-solid fa-file-invoice-dollar"></i> 5. قائمة الدخل (الأرباح والخسائر)</h2>
+‏                    <div class="form-grid">
+‏                        <div class="input-group"><label>مجمل الربح ($)</label><input type="number" id="incGross" value="0"></div>
+‏                        <div class="input-group"><label>الإيرادات الأخرى ($)</label><input type="number" id="incOther" value="0"></div>
+‏                    </div>
+‏                    <div class="input-group" style="margin-top: 15px;"><label>إجمالي المصروفات ($)</label><input type="number" id="incExp" value="0"></div>
+‏                    <button class="btn-custom" onclick="calcIncome()" style="margin-top: 15px;">احتساب صافي الدخل</button>
+‏                    <div id="incResult" class="result-display"></div>
+‏                </section>
+
+                <!-- 6. الميزانية العمومية -->
+‏                <section id="sec-bs" class="accounting-section">
+‏                    <h2><i class="fa-solid fa-building-columns"></i> 6. الميزانية العمومية (المركز المالي)</h2>
+‏                    <div class="input-group" style="margin-bottom: 15px;"><label>إجمالي الأصول ($)</label><input type="number" id="bsAssets" value="0" oninput="calcBS()"></div>
+‏                    <div class="form-grid">
+‏                        <div class="input-group"><label>إجمالي الخصوم ($)</label><input type="number" id="bsLiab" value="0" oninput="calcBS()"></div>
+‏                        <div class="input-group"><label>إجمالي حقوق الملكية ($)</label><input type="number" id="bsEquity" value="0" oninput="calcBS()"></div>
+‏                    </div>
+‏                    <div id="bsResult" class="result-display"></div>
+‏                </section>
+‏            </main>
+‏        </div>
+‏    </div>
+
+‏    <script>
+‏        function handleLogin() {
+‏            let name = document.getElementById('loginName').value.trim();
+‏            let pass = document.getElementById('loginPass').value.trim();
+
+‏            if(!name || !pass) {
+‏                alert('الرجاء إدخال اسم الطالب وكلمة السر بشكل صحيح.');
+‏                return;
+            }
+
+‏            document.getElementById('welcomeStudentName').innerText = name;
+‏            document.getElementById('loginOverlay').style.display = 'none';
+‏            document.getElementById('appContainer').style.display = 'flex';
+        }
+
+‏        let journals = [];
+‏        function addJournalEntry() {
+‏            let desc = document.getElementById('jDesc').value;
+‏            let debit = document.getElementById('jDebit').value;
+‏            let amount = document.getElementById('jAmount').value;
+‏            let credit = document.getElementById('jCredit').value;
+
+‏            if(!desc || !debit || !amount || !credit) {
+‏                alert('الرجاء إكمال بيانات القيد بشكل صحيح.');
+‏                return;
+            }
+
+‏            journals.push({ desc, debit, credit, amount });
+‏            let tbody = document.getElementById('jTableBody');
+‏            tbody.innerHTML = '';
+‏            journals.forEach(item => {
+‏                tbody.innerHTML += `<tr><td>${item.desc}</td><td>${item.amount}$ (من حـ/${item.debit} إلى حـ/${item.credit})</td></tr>`;
+            });
+
+‏            document.getElementById('jDesc').value = '';
+‏            document.getElementById('jDebit').value = '';
+‏            document.getElementById('jAmount').value = '';
+‏            document.getElementById('jCredit').value = '';
+        }
+
+‏        function calcLedger() {
+‏            let d = parseFloat(document.getElementById('lDebit').value) || 0;
+‏            let c = parseFloat(document.getElementById('lCredit').value) || 0;
+‏            let res = document.getElementById('lResult');
+‏            res.style.display = 'block';
+‏            let diff = d - c;
+‏            if(diff > 0) res.innerHTML = `رصيد مدين بقيمة: ${diff.toFixed(2)} $`;
+‏            else if(diff < 0) res.innerHTML = `رصيد دائن بقيمة: ${Math.abs(diff).toFixed(2)} $`;
+‏            else res.innerHTML = `الحساب مقفل رصيده صفر`;
+        }
+
+‏        function calcTrial() {
+‏            let d = parseFloat(document.getElementById('tDebit').value) || 0;
+‏            let c = parseFloat(document.getElementById('tCredit').value) || 0;
+‏            let res = document.getElementById('tResult');
+‏            res.style.display = 'block';
+‏            if(d === c) {
+‏                res.style.color = 'var(--success)';
+‏                res.innerHTML = `ميزان المراجعة متوازن تماماً (${d} = ${c})`;
+‏            } else {
+‏                res.style.color = 'var(--danger)';
+‏                res.innerHTML = `ميزان المراجعة غير متوازن، يوجد فرق: ${Math.abs(d - c)}`;
+            }
+        }
+
+‏        function calcTrading() {
+‏            let op = parseFloat(document.getElementById('trOpen').value) || 0;
+‏            let pur = parseFloat(document.getElementById('trPurchases').value) || 0;
+‏            let sal = parseFloat(document.getElementById('trSales').value) || 0;
+‏            let cl = parseFloat(document.getElementById('trClose').value) || 0;
+‏            let gp = sal - (op + pur - cl);
+‏            let res = document.getElementById('trResult');
+‏            res.style.display = 'block';
+‏            if(gp >= 0) res.innerHTML = `مجمل ربح: ${gp.toFixed(2)} $`;
+‏            else res.innerHTML = `مجمل خسارة: ${Math.abs(gp).toFixed(2)} $`;
+        }
+
+‏        function calcIncome() {
+‏            let g = parseFloat(document.getElementById('incGross').value) || 0;
+‏            let o = parseFloat(document.getElementById('incOther').value) || 0;
+‏            let e = parseFloat(document.getElementById('incExp').value) || 0;
+‏            let net = (g + o) - e;
+‏            let res = document.getElementById('incResult');
+‏            res.style.display = 'block';
+‏            if(net >= 0) res.innerHTML = `صافي الربح: ${net.toFixed(2)} $`;
+‏            else res.innerHTML = `صافي الخسارة: ${Math.abs(net).toFixed(2)} $`;
+        }
+
+‏        function calcBS() {
+‏            let a = parseFloat(document.getElementById('bsAssets').value) || 0;
+‏            let l = parseFloat(document.getElementById('bsLiab').value) || 0;
+‏            let eq = parseFloat(document.getElementById('bsEquity').value) || 0;
+‏            let total = l + eq;
+‏            let res = document.getElementById('bsResult');
+‏            res.style.display = 'block';
+‏            if(a === total) {
+‏                res.style.color = 'var(--success)';
+‏                res.innerHTML = `الميزانية العمومية متوازنة! الأصول (${a}) = الخصوم وحقوق الملكية (${total})`;
+‏            } else {
+‏                res.style.color = 'var(--danger)';
+‏                res.innerHTML = `الميزانية غير متوازنة، الفرق: ${Math.abs(a - total)}`;
+            }
+        }
+‏    </script>
+‏</body>
+‏</html>
