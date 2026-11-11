@@ -1,0 +1,440 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>بوينت ويب - إدارة البضائع الآجلة</title>
+    
+    <!-- إعدادات التثبيت كتطبيق (PWA المدمج) -->
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="theme-color" content="#2563eb">
+    <link rel="manifest" href="data:application/manifest+json;charset=utf-8,%7B%22name%22%3A%22%D8%A8%D9%88%D9%8A%D9%86%D8%AA%20%D9%8 অপারেটিং%20%D9%88%D9%8A%D8%A8%22%2C%22short_name%22%3A%22%D8%A8%D9%88%D9%8A%D9%86%D8%AA%20%D9%88%D9%8A%D8%A8%22%2C%22start_url%22%3A%22.%2Findex.html%22%2C%22display%22%3A%22standalone%22%2C%22background_color%22%3A%22%232563eb%22%2C%22theme_color%22%3A%22%232563eb%22%2C%22icons%22%3A%5B%7B%22src%22%3A%22https%3A%2F%2Fcdn-icons-png.flaticon.com%2F512%2F3135%2F3135715.png%22%2C%22sizes%22%3A%22192x192%22%2C%22type%22%3A%22image%2Fpng%22%7D%5D%7D">
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome للأيقونات -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap');
+        body { font-family: 'Cairo', sans-serif; }
+        @media (max-width: 768px) {
+            .mobile-hidden { display: none !important; }
+        }
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-800 flex h-screen overflow-hidden">
+
+    <!-- الشريط الجانبي (قائمة العملاء) -->
+    <aside id="sidebar" class="w-full md:w-80 bg-white border-l border-gray-200 flex flex-col h-full shadow-sm z-20">
+        <div class="p-4 border-b border-gray-100 flex justify-between items-center bg-blue-600 text-white">
+            <h1 class="font-bold text-lg"><i class="fa-solid fa-store ml-2"></i>بوينت ويب للديون</h1>
+            <span class="text-xs bg-blue-700 px-2 py-1 rounded">محفوظ تلقائياً</span>
+        </div>
+
+        <div class="p-4">
+            <button onclick="openAddCustomerModal()" class="w-full bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded-xl font-semibold transition flex items-center justify-center shadow-sm">
+                <i class="fa-solid fa-user-plus ml-2"></i> إضافة عميل جديد
+            </button>
+        </div>
+
+        <div class="px-4 mb-2">
+            <input type="text" id="searchCustomerInput" oninput="filterCustomers()" placeholder="بحث عن عميل..." class="w-full px-3 py-2 border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+        </div>
+
+        <div id="customersList" class="flex-1 overflow-y-auto px-4 space-y-2 divide-y divide-gray-50">
+            <!-- العملاء -->
+        </div>
+
+        <div class="p-4 bg-gray-100 border-t border-gray-200">
+            <div class="text-xs text-gray-500">إجمالي الآجل الكلي للعملاء:</div>
+            <div id="totalDebtAll" class="text-xl font-bold text-red-600">٠ ر.ي</div>
+        </div>
+    </aside>
+
+    <!-- المحتوى الرئيسي -->
+    <main id="mainContainer" class="flex-1 flex flex-col h-full overflow-hidden bg-gray-50 relative">
+        <div id="mainContent" class="flex-1 overflow-y-auto p-4 md:p-8 flex items-center justify-center text-gray-400">
+            <div class="text-center">
+                <i class="fa-solid fa-address-book text-6xl mb-3 text-gray-300"></i>
+                <p class="text-lg">اختر عميلاً من القائمة لعرض كشف الحساب والديون</p>
+            </div>
+        </div>
+    </main>
+
+    <!-- مودال إضافة عميل -->
+    <div id="customerModal" class="fixed inset-0 bg-black bg-opacity-50 hidden flex items-center justify-center z-50 p-4">
+        <div class="bg-white rounded-2xl w-full max-w-sm p-6 shadow-xl">
+            <h3 class="text-lg font-bold mb-4 text-gray-800">إضافة عميل جديد</h3>
+            <form id="customerForm" onsubmit="saveCustomer(event)">
+                <div class="mb-4">
+                    <label class="block text-sm font-semibold mb-1">اسم العميل</label>
+                    <input type="text" id="clientName" required class="w-full border rounded-xl px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                </div>
+                <div class="mb-4">
+                    <label class="block text-sm font-semibold mb-1">رقم الهاتف (اختياري)</label>
+                    <input type="tel" id="clientPhone" class="w-full border rounded-xl px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                </div>
+                <div class="flex justify-end space-x-2 space-x-reverse">
+                    <button type="button" onclick="closeAddCustomerModal()" class="px-4 py-2 bg-gray-200 rounded-xl text-gray-700 hover:bg-gray-300">إلغاء</button>
+                    <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded-xl hover:bg-blue-700">حفظ</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- مودال إضافة معاملة آجل -->
+    <div id="transactionModal" class="fixed inset-0 bg-black bg-opacity-50 hidden flex items-center justify-center z-50 p-4">
+        <div class="bg-white rounded-2xl w-full max-w-md p-6 shadow-xl max-h-[90vh] overflow-y-auto">
+            <h3 class="text-lg font-bold mb-4 text-gray-800">إضافة بضاعة آجل (سند)</h3>
+            <form id="transactionForm" onsubmit="saveTransaction(event)">
+                <div class="mb-3">
+                    <label class="block text-sm font-semibold mb-1">التاريخ</label>
+                    <input type="date" id="transDate" required class="w-full border rounded-xl px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                </div>
+                <div class="mb-3">
+                    <label class="block text-sm font-semibold mb-1">تفاصيل البضاعة / البيان</label>
+                    <textarea id="transDescription" rows="2" required placeholder="أدخل تفاصيل البضاعة..." class="w-full border rounded-xl px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"></textarea>
+                </div>
+                <div class="mb-3">
+                    <label class="block text-sm font-semibold mb-1">المبلغ (ريال يمني)</label>
+                    <input type="number" step="any" id="transAmount" required placeholder="0.00" class="w-full border rounded-xl px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                </div>
+                <div class="mb-4">
+                    <label class="block text-sm font-semibold mb-1">صورة الفاتورة / السند</label>
+                    <input type="file" id="transImage" accept="image/*" onchange="previewImage(event)" class="w-full border rounded-xl px-3 py-2 text-sm">
+                    <div id="imagePreviewContainer" class="mt-2 hidden">
+                        <img id="imagePreview" class="h-32 object-contain mx-auto border rounded-lg">
+                    </div>
+                </div>
+                <div class="flex justify-end space-x-2 space-x-reverse">
+                    <button type="button" onclick="closeTransactionModal()" class="px-4 py-2 bg-gray-200 rounded-xl text-gray-700 hover:bg-gray-300">إلغاء</button>
+                    <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded-xl hover:bg-blue-700">حفظ المعاملة</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- نافذة عرض الصورة بحجم كبير -->
+    <div id="imageModal" class="fixed inset-0 bg-black bg-opacity-80 hidden flex items-center justify-center z-50 p-4" onclick="closeImageModal()">
+        <img id="fullScreenImage" class="max-w-[90%] max-h-[90%] rounded-lg shadow-2xl">
+    </div>
+
+    <!-- إشعار الحفظ -->
+    <div id="toast" class="fixed bottom-5 left-5 bg-gray-900 text-white px-4 py-2 rounded-xl shadow-lg transform translate-y-20 transition duration-300 z-50 text-sm">
+        تم الحفظ تلقائياً بنجاح
+    </div>
+
+    <!-- الجافاسكريفت والمنطق -->
+    <script>
+        const DB_NAME = 'PointWebDatabase';
+        const DB_VERSION = 1;
+        let db = null;
+        let currentCustomerId = null;
+        let currentUploadedImageBase64 = '';
+        let allCustomersData = [];
+
+        function initDB() {
+            return new Promise((resolve, reject) => {
+                const request = indexedDB.open(DB_NAME, DB_VERSION);
+                request.onupgradeneeded = (event) => {
+                    const database = event.target.result;
+                    if (!database.objectStoreNames.contains('customers')) {
+                        database.createObjectStore('customers', { keyPath: 'id' });
+                    }
+                    if (!database.objectStoreNames.contains('transactions')) {
+                        const transStore = database.createObjectStore('transactions', { keyPath: 'id' });
+                        transStore.createIndex('customerId', 'customerId', { unique: false });
+                    }
+                };
+                request.onsuccess = (event) => { db = event.target.result; loadCustomers(); resolve(db); };
+                request.onerror = (event) => reject(event.target.error);
+            });
+        }
+
+        function showToast(message = "تم الحفظ تلقائياً بنجاح") {
+            const toast = document.getElementById('toast');
+            toast.innerText = message;
+            toast.classList.remove('translate-y-20');
+            setTimeout(() => { toast.classList.add('translate-y-20'); }, 2500);
+        }
+
+        async function loadCustomers() {
+            const transaction = db.transaction(['customers', 'transactions'], 'readonly');
+            const custStore = transaction.objectStore('customers');
+            const transStore = transaction.objectStore('transactions');
+            
+            const custReq = custStore.getAll();
+            const transReq = transStore.getAll();
+
+            custReq.onsuccess = () => {
+                transReq.onsuccess = () => {
+                    allCustomersData = custReq.result;
+                    const transactions = transReq.result;
+                    renderCustomersList(allCustomersData, transactions);
+                    calculateTotalDebtAll(transactions);
+                    if (currentCustomerId) {
+                        openCustomerPage(currentCustomerId);
+                    }
+                };
+            };
+        }
+
+        function calculateTotalDebtAll(transactions) {
+            const total = transactions.reduce((sum, t) => sum + (parseFloat(t.amount) || 0), 0);
+            document.getElementById('totalDebtAll').innerText = total.toLocaleString() + ' ر.ي';
+        }
+
+        function renderCustomersList(customers, transactions) {
+            const listContainer = document.getElementById('customersList');
+            listContainer.innerHTML = '';
+
+            if (customers.length === 0) {
+                listContainer.innerHTML = '<div class="text-center py-6 text-gray-400 text-sm">لا يوجد عملاء مضافون</div>';
+                return;
+            }
+
+            customers.forEach(cust => {
+                const custTrans = transactions.filter(t => t.customerId === cust.id);
+                const custTotal = custTrans.reduce((sum, t) => sum + (parseFloat(t.amount) || 0), 0);
+
+                const item = document.createElement('div');
+                item.className = `p-3 rounded-xl cursor-pointer transition hover:bg-blue-50 flex justify-between items-center ${currentCustomerId === cust.id ? 'bg-blue-100 border-r-4 border-blue-600' : ''}`;
+                item.onclick = () => openCustomerPage(cust.id);
+                item.innerHTML = `
+                    <div>
+                        <div class="font-bold text-gray-800 text-sm">${cust.name}</div>
+                        <div class="text-xs text-gray-500">${cust.phone || 'بدون هاتف'}</div>
+                    </div>
+                    <div class="text-left">
+                        <div class="font-bold text-red-600 text-xs md:text-sm">${custTotal.toLocaleString()} ر.ي</div>
+                    </div>
+                `;
+                listContainer.appendChild(item);
+            });
+        }
+
+        function filterCustomers() {
+            const query = document.getElementById('searchCustomerInput').value.toLowerCase();
+            const filtered = allCustomersData.filter(c => c.name.toLowerCase().includes(query) || (c.phone && c.phone.includes(query)));
+            
+            const transaction = db.transaction(['transactions'], 'readonly');
+            const transReq = transaction.objectStore('transactions').getAll();
+            transReq.onsuccess = () => {
+                renderCustomersList(filtered, transReq.result);
+            };
+        }
+
+        function openAddCustomerModal() { document.getElementById('customerModal').classList.remove('hidden'); }
+        function closeAddCustomerModal() { document.getElementById('customerModal').classList.add('hidden'); document.getElementById('customerForm').reset(); }
+
+        function saveCustomer(event) {
+            event.preventDefault();
+            const name = document.getElementById('clientName').value;
+            const phone = document.getElementById('clientPhone').value;
+            const newCustomer = { id: 'cust_' + Date.now(), name, phone, createdAt: new Date().toISOString() };
+
+            const transaction = db.transaction(['customers'], 'readwrite');
+            transaction.objectStore('customers').add(newCustomer);
+            transaction.oncomplete = () => {
+                closeAddCustomerModal();
+                showToast("تم حفظ العميل بنجاح");
+                loadCustomers();
+                openCustomerPage(newCustomer.id);
+            };
+        }
+
+        function openCustomerPage(customerId) {
+            currentCustomerId = customerId;
+            const transaction = db.transaction(['customers', 'transactions'], 'readonly');
+            const custReq = transaction.objectStore('customers').get(customerId);
+            const transStore = transaction.objectStore('transactions');
+            const index = transStore.index('customerId');
+            const transReq = index.getAll(customerId);
+
+            custReq.onsuccess = () => {
+                const cust = custReq.result;
+                if (!cust) return;
+
+                transReq.onsuccess = () => {
+                    const transList = transReq.result;
+                    const totalDebt = transList.reduce((sum, t) => sum + (parseFloat(t.amount) || 0), 0);
+
+                    const main = document.getElementById('mainContent');
+                    main.classList.remove('items-center', 'justify-center');
+                    main.innerHTML = `
+                        <div class="max-w-4xl w-full mx-auto pb-10">
+                            <div class="mb-4 md:hidden">
+                                <button onclick="backToSidebar()" class="bg-gray-200 text-gray-700 px-3 py-1.5 rounded-lg text-xs font-bold flex items-center">
+                                    <i class="fa-solid fa-arrow-right ml-1"></i> العودة لقائمة العملاء
+                                </button>
+                            </div>
+
+                            <div class="bg-white p-4 md:p-6 rounded-2xl shadow-sm border border-gray-100 flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6">
+                                <div>
+                                    <h2 class="text-xl md:text-2xl font-bold text-gray-800">${cust.name}</h2>
+                                    <p class="text-xs md:text-sm text-gray-500"><i class="fa-solid fa-phone ml-1"></i> ${cust.phone || 'لا يوجد رقم هاتف'}</p>
+                                </div>
+                                <div class="flex items-center justify-between w-full md:w-auto space-x-3 space-x-reverse">
+                                    <div class="text-left bg-red-50 px-3 py-2 rounded-xl border border-red-100">
+                                        <div class="text-[10px] text-red-500 font-semibold">إجمالي الدين</div>
+                                        <div class="text-base md:text-lg font-bold text-red-600">${totalDebt.toLocaleString()} ر.ي</div>
+                                    </div>
+                                    <button onclick="deleteCustomer('${cust.id}')" class="text-gray-400 hover:text-red-600 p-2"><i class="fa-solid fa-trash"></i></button>
+                                </div>
+                            </div>
+
+                            <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-3 mb-4">
+                                <h3 class="font-bold text-base md:text-lg text-gray-700">سجل البضائع الآجلة والفواتير</h3>
+                                <button onclick="openTransactionModal()" class="w-full md:w-auto bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-xl font-semibold transition flex items-center justify-center shadow-sm text-sm">
+                                    <i class="fa-solid fa-plus ml-2"></i> إضافة بضاعة / سند آجل
+                                </button>
+                            </div>
+
+                            <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-x-auto">
+                                <table class="w-full text-right border-collapse min-w-[500px]">
+                                    <thead>
+                                        <tr class="bg-gray-50 border-b text-xs md:text-sm text-gray-600">
+                                            <th class="p-3">التاريخ</th>
+                                            <th class="p-3">تفاصيل البضاعة</th>
+                                            <th class="p-3">المبلغ</th>
+                                            <th class="p-3">صورة السند</th>
+                                            <th class="p-3 text-center">إجراء</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody class="divide-y divide-gray-100 text-xs md:text-sm">
+                                        ${transList.length === 0 ? `<tr><td colspan="5" class="text-center py-8 text-gray-400">لا توجد معاملات مسجلة لهذا العميل</td></tr>` : 
+                                          transList.map(t => `
+                                            <tr class="hover:bg-gray-50">
+                                                <td class="p-3 text-gray-600">${t.date}</td>
+                                                <td class="p-3 font-medium text-gray-800">${t.description}</td>
+                                                <td class="p-3 font-bold text-red-600">${parseFloat(t.amount).toLocaleString()} ر.ي</td>
+                                                <td class="p-3">
+                                                    ${t.imageBase64 ? `<img src="${t.imageBase64}" class="h-10 w-10 object-cover rounded cursor-pointer border" onclick="showImageModal('${t.imageBase64}')">` : '<span class="text-gray-400 text-xs">بدون صورة</span>'}
+                                                </td>
+                                                <td class="p-3 text-center">
+                                                    <button onclick="deleteTransaction('${t.id}')" class="text-red-500 hover:text-red-700 p-1"><i class="fa-solid fa-trash-can"></i></button>
+                                                </td>
+                                            </tr>
+                                          `).join('')}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    `;
+                    if (window.innerWidth < 768) {
+                        document.getElementById('sidebar').classList.add('mobile-hidden');
+                    }
+                    loadCustomers();
+                };
+            };
+        }
+
+        function backToSidebar() {
+            document.getElementById('sidebar').classList.remove('mobile-hidden');
+            document.getElementById('mainContent').innerHTML = `
+                <div class="text-center">
+                    <i class="fa-solid fa-address-book text-6xl mb-3 text-gray-300"></i>
+                    <p class="text-lg">اختر عميلاً من القائمة لعرض كشف الحساب والديون</p>
+                </div>
+            `;
+            document.getElementById('mainContent').classList.add('items-center', 'justify-center');
+            currentCustomerId = null;
+            loadCustomers();
+        }
+
+        function openTransactionModal() {
+            document.getElementById('transDate').valueAsDate = new Date();
+            document.getElementById('transactionModal').classList.remove('hidden');
+        }
+        function closeTransactionModal() {
+            document.getElementById('transactionModal').classList.add('hidden');
+            document.getElementById('transactionForm').reset();
+            document.getElementById('imagePreviewContainer').classList.add('hidden');
+            currentUploadedImageBase64 = '';
+        }
+
+        function previewImage(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                currentUploadedImageBase64 = e.target.result;
+                document.getElementById('imagePreview').src = currentUploadedImageBase64;
+                document.getElementById('imagePreviewContainer').classList.remove('hidden');
+            };
+            reader.readAsDataURL(file);
+        }
+
+        function saveTransaction(event) {
+            event.preventDefault();
+            const date = document.getElementById('transDate').value;
+            const description = document.getElementById('transDescription').value;
+            const amount = parseFloat(document.getElementById('transAmount').value);
+
+            const newTrans = {
+                id: 'trans_' + Date.now(),
+                customerId: currentCustomerId,
+                date,
+                description,
+                amount,
+                imageBase64: currentUploadedImageBase64
+            };
+
+            const transaction = db.transaction(['transactions'], 'readwrite');
+            transaction.objectStore('transactions').add(newTrans);
+            transaction.oncomplete = () => {
+                closeTransactionModal();
+                showToast("تم حفظ المعاملة بنجاح");
+                openCustomerPage(currentCustomerId);
+            };
+        }
+
+        function deleteTransaction(transId) {
+            if (confirm('هل أنت متأكد من حذف هذه المعاملة؟')) {
+                const transaction = db.transaction(['transactions'], 'readwrite');
+                transaction.objectStore('transactions').delete(transId);
+                transaction.oncomplete = () => {
+                    showToast("تم الحذف بنجاح");
+                    openCustomerPage(currentCustomerId);
+                };
+            }
+        }
+
+        function deleteCustomer(custId) {
+            if (confirm('هل أنت متأكد من حذف العميل وكل معاملاته؟')) {
+                const transaction = db.transaction(['customers', 'transactions'], 'readwrite');
+                transaction.objectStore('customers').delete(custId);
+                
+                const transStore = transaction.objectStore('transactions');
+                const index = transStore.index('customerId');
+                const req = index.openCursor(IDBKeyRange.only(custId));
+                req.onsuccess = (e) => {
+                    const cursor = e.target.result;
+                    if (cursor) {
+                        transStore.delete(cursor.primaryKey);
+                        cursor.continue();
+                    }
+                };
+
+                transaction.oncomplete = () => {
+                    currentCustomerId = null;
+                    backToSidebar();
+                    showToast("تم حذف العميل بنجاح");
+                };
+            }
+        }
+
+        function showImageModal(base64) {
+            document.getElementById('fullScreenImage').src = base64;
+            document.getElementById('imageModal').classList.remove('hidden');
+        }
+        function closeImageModal() {
+            document.getElementById('imageModal').classList.add('hidden');
+        }
+
+        window.onload = initDB;
+    </script>
+</body>
+</html>
